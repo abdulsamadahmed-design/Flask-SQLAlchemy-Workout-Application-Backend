@@ -1,12 +1,18 @@
+#!/usr/bin/env python3
+
 from datetime import date, timedelta
-from .app import app
-from .models import db, Workout, Exercise, WorkoutExercise
+
+from app import app
+from models import db, Workout, Exercise, WorkoutExercise
 
 
 def seed():
     with app.app_context():
-        db.drop_all()
-        db.create_all()
+    
+        WorkoutExercise.query.delete()
+        Workout.query.delete()
+        Exercise.query.delete()
+        db.session.commit()
 
         strength = Exercise(name="Push-ups", category="Strength", equipment_needed=False)
         cardio = Exercise(name="Running", category="Cardio", equipment_needed=False)
