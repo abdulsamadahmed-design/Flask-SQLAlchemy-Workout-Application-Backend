@@ -35,3 +35,23 @@ def test_schema_rejects_invalid_workout_duration(client):
 def test_not_found_workout(client):
     response = client.get("/workouts/999")
     assert response.status_code == 404
+
+def test_blank_exercise_name_rejected(client):
+    response = client.post("/exercises", json={"name": "   ", "category": "Core"})
+    assert response.status_code == 400
+
+
+def test_link_requires_a_measure(client):
+    client.post("/workouts", json={"duration_minutes": 30})
+    client.post("/exercises", json={"name": "Squats", "category": "Strength"})
+    response = client.post("/workouts/1/exercises/1/workout_exercises", json={})
+    assert response.status_code == 400
+
+
+def test_delete_workout_removes_its_links(client):
+    client.post("/workouts", json={"duration_minutes": 30})
+    client.post("/exercises", json={"name": "Squats", "category": "Strength"})
+    client.post("/workouts/1/exercises/1/workout_exercises", json={"reps": 10})
+    assert client.delete("/workouts/1").status_code == 204
+    assert client.get("/exercises/1").json["workouts"] == []
+    

@@ -1,10 +1,14 @@
 from marshmallow import Schema, fields, validate, validates_schema, ValidationError
 
+def not_blank(value):
+    if not value.strip():
+        raise ValidationError("Must not be blank.")
+
 
 class ExerciseSchema(Schema):
     id = fields.Int(dump_only=True)
-    name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
-    category = fields.Str(required=True, validate=validate.Length(min=1, max=60))
+    name = fields.Str(required=True, validate=[validate.Length(min=1, max=100), not_blank])
+    category = fields.Str(required=True, validate=[validate.Length(min=1, max=60), not_blank])
     equipment_needed = fields.Bool(load_default=False)
     workouts = fields.Method("get_workouts", dump_only=True)
 
